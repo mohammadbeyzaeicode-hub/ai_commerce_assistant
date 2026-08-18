@@ -1,0 +1,35 @@
+# aiohttp>=3.9.0
+# python-dotenv>=1.0.0
+# pydantic>=2.5.0
+# requests>=2.32.3
+
+# # OpenAI SDK جدید (برای gpt-4o, gpt-5.1, tool calling)
+# openai>=1.55.0
+
+# # Redis backend برای Session (اختیاری ولی توصیه می‌شود)
+# # redis>=5.0.1
+
+# # اگر Webhook FastAPI داری
+# # fastapi>=0.115.0
+# # uvicorn>=0.30.6
+
+# # اگر از SQLAlchemy برای دیتابیس استفاده می‌کنی
+# # SQLAlchemy>=2.0.30
+
+# # اگر async redis خواستی:
+# # aioredis>=2.0.1
+
+# # برای تایپ هینت پیشرفته
+# typing-extensions>=4.12.0
+
+# python-telegram-bot==20.3
+
+#-------------------------------------------------------------------
+
+aiohttp>=3.9.0
+python-dotenv>=1.0.0
+pydantic>=2.5.0
+openai>=1.55.0
+typing-extensions>=4.12.0
+python-telegram-bot==20.3
+SQLAlchemy

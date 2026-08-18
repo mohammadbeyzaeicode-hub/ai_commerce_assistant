@@ -1,0 +1,7 @@
+.venv/
+.env
+.vscode/
+guide/
+database.db
+seed.sql
+alembic.ini
