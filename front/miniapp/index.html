@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#f6f3ed">
+  <title>فروشگاه شما</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">فروشگاه آنلاین</p>
+        <h1>خرید ساده، انتخاب مطمئن</h1>
+      </div>
+      <button id="close-app" class="icon-button" type="button" aria-label="بستن برنامه">×</button>
+    </header>
+
+    <section class="welcome-panel" aria-labelledby="welcome-title">
+      <div>
+        <span class="status-dot"></span>
+        <span id="telegram-status">در حال اتصال به تلگرام...</span>
+      </div>
+      <h2 id="welcome-title">محصول مناسب شما<br><strong>همین‌جاست.</strong></h2>
+      <p>فعلاً این صفحه‌ی اولیه برای راه‌اندازی Mini App است.</p>
+    </section>
+
+    <section class="section-heading">
+      <div>
+        <p class="eyebrow">پیشنهاد امروز</p>
+        <h2>محصول نمونه</h2>
+      </div>
+      <span class="counter">۰۱</span>
+    </section>
+
+    <article class="product-card">
+      <div class="product-art" aria-hidden="true">
+        <span class="art-label">NEW</span>
+        <div class="product-shape"></div>
+      </div>
+      <div class="product-info">
+        <div>
+          <p class="product-category">دسته‌بندی محصول</p>
+          <h3>محصول آزمایشی فروشگاه</h3>
+        </div>
+        <p class="product-description">این کارت در مرحله بعد با محصولات واقعی و اطلاعات دیتابیس جایگزین می‌شود.</p>
+        <div class="product-footer">
+          <strong>۱۲۰٬۰۰۰ تومان</strong>
+          <button class="add-button" type="button" disabled>افزودن</button>
+        </div>
+      </div>
+    </article>
+
+    <p class="next-step">مرحله بعد: اتصال لیست محصولات به API فروشگاه</p>
+  </main>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

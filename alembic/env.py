@@ -18,16 +18,16 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
-from core.db import Base
-from models.user import User
-from models.store_channel import StoreChannel
-from models.store import Store
-from models.product import Product
-from models.order import Order
-from models.order_item import OrderItem
-from models.chat_session import ChatSession
-from models.chat_message import ChatMessage
-from models.telegram_reply import ReplyMessageBinding
+from back.src.core.db import Base
+from back.src.models.user import User
+from back.src.models.store_channel import StoreChannel
+from back.src.models.store import Store
+from back.src.models.product import Product
+from back.src.models.order import Order
+from back.src.models.order_item import OrderItem
+from back.src.models.chat_session import ChatSession
+from back.src.models.chat_message import ChatMessage
+from back.src.models.telegram_reply import ReplyMessageBinding
 
 
 
