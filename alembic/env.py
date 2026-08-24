@@ -22,7 +22,7 @@ from back.src.core.db import Base
 from back.src.models.user import User
 from back.src.models.store_channel import StoreChannel
 from back.src.models.store import Store
-from back.src.models.product import Product
+from back.src.models.product.domain.entities.product import Product
 from back.src.models.order import Order
 from back.src.models.order_item import OrderItem
 from back.src.models.chat_session import ChatSession

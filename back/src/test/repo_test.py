@@ -4,7 +4,7 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(ROOT, ".."))
 
 import asyncio
-from back.src.repositories.product_repository import InMemoryProductRepository
+from back.src.models.product.domain.repositories.product_repository import InMemoryProductRepository
 
 
 async def main():

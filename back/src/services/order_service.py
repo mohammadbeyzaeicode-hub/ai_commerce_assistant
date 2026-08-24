@@ -1,6 +1,6 @@
 from typing import Optional, List, Dict
 from back.src.models.order import Order
-from back.src.repositories.sqlalchemy_base_repository import SqlAlchemyRepository
+from back.src.infrastructure.database.repositories.sqlalchemy_base_repository import SqlAlchemyRepository
 
 
 

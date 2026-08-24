@@ -1,7 +1,7 @@
 from typing import Optional, List, Dict
 
 from back.src.models.user import User
-from back.src.repositories.sqlalchemy_base_repository import SqlAlchemyRepository
+from back.src.infrastructure.database.repositories.sqlalchemy_base_repository import SqlAlchemyRepository
 
 
 class UserService:

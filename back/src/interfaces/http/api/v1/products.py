@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from back.src.repositories.product_repository import ProductRepository
-from back.src.services.product_service import ProductService
+from back.src.models.product.domain.repositories.product_repository import ProductRepository
+from back.src.models.product.aplication.services.product_service import ProductService
 from back.src.interfaces.http.dependencies import get_db
 from back.src.interfaces.http.api.v1.schemas.product import ProductResponse
 

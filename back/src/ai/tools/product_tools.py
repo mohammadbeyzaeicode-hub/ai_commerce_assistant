@@ -1,8 +1,8 @@
 from typing import Dict, Optional
 
-from back.src.services import product_service
+from back.src.models.product.aplication.services import product_service
 from .base import BaseTool
-from back.src.services.product_service import ProductService
+from back.src.models.product.aplication.services.product_service import ProductService
 
 
 class CreateProductTool(BaseTool):

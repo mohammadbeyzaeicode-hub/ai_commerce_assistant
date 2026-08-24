@@ -13,7 +13,7 @@ from back.src.core.key import SessionKey
 from back.src.core.settings import settings
 from back.src.models.Enum.enum import SenderType
 from back.src.services import chat_log_service, order_service
-from back.src.services import product_service
+from back.src.models.product.aplication.services import product_service
 from back.src.services.integrations.context import RequestContext
 
 class LLMOrchestrator:

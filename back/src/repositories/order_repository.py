@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from typing import Optional, List
 
 from back.src.models.order import Order
-from .base_repository import AbstractRepository
+from ..infrastructure.database.repositories.base_repository import AbstractRepository
 
 
 class SqlAlchemyOrderRepository(AbstractRepository):

@@ -1,6 +1,6 @@
 from typing import Dict
 from .base import BaseTool
-from back.src.services.product_service import ProductService
+from back.src.models.product.aplication.services.product_service import ProductService
 
 
 class CheckInventoryTool(BaseTool):
