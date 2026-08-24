@@ -1,3 +1,7 @@
+from dataclasses import dataclass
+
+
+@dataclass
 class TenantContext:
     def __init__(self, tenant_id: str, user_id: str, channel: str):
         self.tenant_id = tenant_id
