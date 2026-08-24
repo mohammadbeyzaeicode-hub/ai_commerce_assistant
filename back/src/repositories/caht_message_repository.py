@@ -1,5 +1,5 @@
 from back.src.models.chat_message import ChatMessage
-from back.src.repositories.sqlalchemy_base_repository import SqlAlchemyRepository
+from back.src.infrastructure.database.repositories.sqlalchemy_base_repository import SqlAlchemyRepository
 
 
 from typing import List

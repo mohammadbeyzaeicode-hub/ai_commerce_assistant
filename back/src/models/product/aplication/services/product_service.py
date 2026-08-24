@@ -1,8 +1,8 @@
 from itertools import product
 from typing import Optional, List, Dict
-from back.src.models.product import Product
-from back.src.repositories.product_repository import ProductRepository
-from back.src.repositories.sqlalchemy_base_repository import SqlAlchemyRepository
+from back.src.models.product.domain.entities.product import Product
+from back.src.models.product.domain.repositories.product_repository import ProductRepository
+from back.src.infrastructure.database.repositories.sqlalchemy_base_repository import SqlAlchemyRepository
 
 
 class ProductService:

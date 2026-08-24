@@ -29,10 +29,10 @@ from back.src.ai.tools.order_tools import CreateOrderTool
 from back.src.ai.tools.product_tools import CreateProductTool , CheckInventoryTool, SearchInventoryTool, UpdateProductTool
 from back.src.ai.tools.seller.seller_tools import SellerTools
 from back.src.core.settings import settings
-from back.src.repositories import product_repository
+from back.src.models.product.domain.repositories import product_repository
 from back.src.repositories.order_repository import SqlAlchemyOrderRepository
-from back.src.repositories.product_repository import ProductRepository
-from back.src.services import product_service
+from back.src.models.product.domain.repositories.product_repository import ProductRepository
+from back.src.models.product.aplication.services import product_service
 from back.src.core.db import SessionLocal
 from pathlib import Path
 

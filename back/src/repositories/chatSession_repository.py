@@ -1,6 +1,6 @@
 from back.src.models.Enum.enum import ChatState
 from back.src.models.chat_session import ChatSession
-from back.src.repositories.sqlalchemy_base_repository import SqlAlchemyRepository
+from back.src.infrastructure.database.repositories.sqlalchemy_base_repository import SqlAlchemyRepository
 
 
 from typing import Optional

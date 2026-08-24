@@ -4,7 +4,7 @@ from typing import Optional, List, Dict
 
 from back.src.models.telegram_reply import ReplyMessageBinding
 from back.src.models.user import User
-from back.src.repositories.sqlalchemy_base_repository import SqlAlchemyRepository
+from back.src.infrastructure.database.repositories.sqlalchemy_base_repository import SqlAlchemyRepository
 from back.src.repositories.telegram_binding_repository import TelegramBindingRepository
 from back.src.services.Interfaces.telegramBinding import ReplyMessageBindingService
 

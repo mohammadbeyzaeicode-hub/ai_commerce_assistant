@@ -6,9 +6,9 @@ sys.path.append(os.path.join(ROOT, ".."))
 import asyncio
 
 from back.src.core.db import SessionLocal
-from back.src.repositories.product_repository import ProductRepository
-from back.src.services.product_service import ProductService
-from back.src.models.product import Product
+from back.src.models.product.domain.repositories.product_repository import ProductRepository
+from back.src.models.product.aplication.services.product_service import ProductService
+from back.src.models.product.domain.entities.product import Product
 
 
 async def run():
