@@ -32,12 +32,13 @@
     <section class="section-heading">
       <div>
         <p class="eyebrow">پیشنهاد امروز</p>
-        <h2>محصول نمونه</h2>
+        <h2>محصولات فروشگاه</h2>
       </div>
-      <span class="counter">۰۱</span>
+      <button id="load-products" class="load-button" type="button">دریافت محصولات</button>
     </section>
 
-    <article class="product-card">
+    <div id="products-list" class="products-list" aria-live="polite">
+      <article class="product-card product-placeholder">
       <div class="product-art" aria-hidden="true">
         <span class="art-label">NEW</span>
         <div class="product-shape"></div>
@@ -53,9 +54,10 @@
           <button class="add-button" type="button" disabled>افزودن</button>
         </div>
       </div>
-    </article>
+      </article>
+    </div>
 
-    <p class="next-step">مرحله بعد: اتصال لیست محصولات به API فروشگاه</p>
+    <p id="products-message" class="next-step">برای مشاهده محصولات، دکمه دریافت را بزنید.</p>
   </main>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="app.js"></script>

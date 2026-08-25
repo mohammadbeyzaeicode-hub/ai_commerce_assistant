@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 # مسیر .env (روت پروژه)
 BASE_DIR = Path(__file__).resolve().parent.parent
-ENV_PATH = BASE_DIR.parent / ".env"
+ENV_PATH = BASE_DIR.parent.parent / ".env"
 
 # بارگذاری .env
 if ENV_PATH.exists():

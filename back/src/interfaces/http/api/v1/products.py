@@ -5,6 +5,7 @@ from back.src.models.product.domain.repositories.product_repository import Produ
 from back.src.models.product.aplication.services.product_service import ProductService
 from back.src.interfaces.http.dependencies import get_db
 from back.src.interfaces.http.api.v1.schemas.product import ProductResponse
+from back.src.models.product.infrastructure.repositories.sqlalchemy_product_repository import SqlAlchemyProductRepository
 
 
 router = APIRouter(
@@ -16,7 +17,7 @@ router = APIRouter(
 def get_product_service(
     db: Session = Depends(get_db),
 ) -> ProductService:
-    product_repo = ProductRepository(db)
+    product_repo = SqlAlchemyProductRepository(db)
     return ProductService(product_repo)
 
 

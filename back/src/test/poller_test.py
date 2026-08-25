@@ -4,7 +4,8 @@ import os
 
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.join(ROOT, ".."))
+PROJECT_ROOT = os.path.abspath(os.path.join(ROOT, "..", "..", ".."))
+sys.path.insert(0, PROJECT_ROOT)
 
 import asyncio
 from back.src.services.integrations.telegram_poller import TelegramPoller
