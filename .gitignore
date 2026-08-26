@@ -9,3 +9,9 @@ README1.md
 src_tree.txt
 front_tree.txt
 project_tree.txt
+seed/
+*.log
+*.yml
+*.ps1
+config.js
+

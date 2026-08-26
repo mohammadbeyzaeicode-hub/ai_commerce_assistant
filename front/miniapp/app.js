@@ -1,69 +1,112 @@
 const telegram = window.Telegram?.WebApp;
-const status = document.getElementById('telegram-status');
+const statusText = document.getElementById('status-text');
 const closeButton = document.getElementById('close-app');
-const loadProductsButton = document.getElementById('load-products');
 const productsList = document.getElementById('products-list');
-const productsMessage = document.getElementById('products-message');
-const productsEndpoint = 'https://fair-democrat-horizontal-secret.trycloudflare.com/api/v1/products/';
+const productsState = document.getElementById('products-state');
+const stateTitle = document.getElementById('state-title');
+const stateMessage = document.getElementById('state-message');
+const retryButton = document.getElementById('retry-products');
+// const productsEndpoint = 'https://fair-democrat-horizontal-secret.trycloudflare.com/api/v1/products/';
+const productsEndpoint = `${window.APP_CONFIG.API_BASE_URL}/api/v1/products/`;
 
 const numberFormatter = new Intl.NumberFormat('fa-IR');
 
 function productCard(product) {
   const card = document.createElement('article');
   card.className = 'product-card';
-  card.innerHTML = `
-    <div class="product-art" aria-hidden="true">
-      <span class="art-label">${product.is_active ? 'موجود' : 'غیرفعال'}</span>
-      <div class="product-shape"></div>
-    </div>
-    <div class="product-info">
-      <div>
-        <p class="product-category">شناسه محصول: ${numberFormatter.format(product.id)}</p>
-        <h3></h3>
-      </div>
-      <p class="product-description"></p>
-      <div class="product-footer">
-        <strong>${numberFormatter.format(product.price)} تومان</strong>
-        <span class="inventory">موجودی: ${numberFormatter.format(product.inventory)}</span>
-      </div>
-    </div>`;
-  card.querySelector('h3').textContent = product.name;
-  card.querySelector('.product-description').textContent = product.description || 'توضیحی برای این محصول ثبت نشده است.';
+  card.tabIndex = 0;
+  card.setAttribute('role', 'button');
+  card.setAttribute('aria-label', `مشاهده ${product.name}`);
+
+  const imageArea = document.createElement('div');
+  imageArea.className = 'product-image';
+  const imageLabel = document.createElement('span');
+  imageLabel.className = 'image-label';
+  imageLabel.textContent = 'تصویر محصول';
+  if (typeof product.image_url === 'string' && product.image_url) {
+    const image = document.createElement('img');
+    image.src = product.image_url;
+    image.alt = product.name;
+    imageArea.append(image);
+  } else {
+    const imageMark = document.createElement('span');
+    imageMark.className = 'image-mark';
+    imageMark.setAttribute('aria-hidden', 'true');
+    imageMark.textContent = '✦';
+    imageArea.append(imageMark);
+  }
+  imageArea.append(imageLabel);
+
+  const info = document.createElement('div');
+  info.className = 'product-info';
+  const name = document.createElement('h3');
+  name.textContent = product.name;
+  const description = document.createElement('p');
+  description.className = 'product-description';
+  description.textContent = product.description || 'توضیحی برای این محصول ثبت نشده است.';
+  const footer = document.createElement('div');
+  footer.className = 'product-footer';
+  const price = document.createElement('strong');
+  price.textContent = `${numberFormatter.format(product.price)} تومان`;
+  const availability = document.createElement('span');
+  availability.className = product.is_active && product.inventory > 0 ? 'inventory available' : 'inventory unavailable';
+  availability.textContent = product.is_active && product.inventory > 0
+    ? `موجودی: ${numberFormatter.format(product.inventory)}`
+    : 'ناموجود';
+  footer.append(price, availability);
+  info.append(name, description, footer);
+  card.append(imageArea, info);
+  card.addEventListener('click', () => handleProductClick(product));
+  card.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleProductClick(product);
+    }
+  });
   return card;
 }
 
+function handleProductClick(product) {
+  console.info('Product selected; details page is not implemented yet.', product.id);
+}
+
+function showState(title, message, canRetry = false) {
+  stateTitle.textContent = title;
+  stateMessage.textContent = message;
+  retryButton.hidden = !canRetry;
+  productsState.hidden = false;
+}
+
 async function loadProducts() {
-  loadProductsButton.disabled = true;
-  loadProductsButton.textContent = 'در حال دریافت...';
-  productsMessage.textContent = 'در حال دریافت محصولات...';
+  retryButton.disabled = true;
+  productsList.setAttribute('aria-busy', 'true');
+  productsState.hidden = true;
+  productsList.innerHTML = '<div class="skeleton-card" aria-hidden="true"><div class="skeleton-image"></div><div class="skeleton-lines"><span></span><span></span><span></span></div></div>'.repeat(3);
 
   try {
     const response = await fetch(productsEndpoint);
-    console.log('Products response:', response);
     if (!response.ok) throw new Error(`Products request failed: ${response.status}`);
 
     const products = await response.json();
     productsList.replaceChildren(...products.map(productCard));
-    productsMessage.textContent = products.length
-      ? `${numberFormatter.format(products.length)} محصول دریافت شد.`
-      : 'محصولی برای نمایش وجود ندارد.';
+    productsList.setAttribute('aria-busy', 'false');
+    if (!products.length) showState('محصولی پیدا نشد', 'در حال حاضر محصولی برای نمایش وجود ندارد.');
   } catch (error) {
-    productsMessage.textContent = 'دریافت محصولات انجام نشد. اتصال API را بررسی کنید.';
     productsList.replaceChildren();
+    productsList.setAttribute('aria-busy', 'false');
+    showState('دریافت محصولات انجام نشد', 'اتصال به فروشگاه برقرار نشد. دوباره تلاش کنید.', true);
     console.error(error);
   } finally {
-    loadProductsButton.disabled = false;
-    loadProductsButton.textContent = 'دریافت محصولات';
+    retryButton.disabled = false;
   }
 }
 
 if (telegram) {
   telegram.ready();
   telegram.expand();
-  status.textContent = telegram.initData ? 'متصل به تلگرام' : 'صفحه در حالت تست مرورگر';
-  telegram.MainButton.setText('ادامه خرید').hide();
+  statusText.textContent = telegram.initData ? 'متصل به تلگرام' : 'حالت آزمایشی مرورگر';
 } else {
-  status.textContent = 'صفحه در حالت تست مرورگر';
+  statusText.textContent = 'حالت آزمایشی مرورگر';
 }
 
 closeButton.addEventListener('click', () => {
@@ -71,4 +114,5 @@ closeButton.addEventListener('click', () => {
   else window.history.back();
 });
 
-loadProductsButton.addEventListener('click', loadProducts);
+retryButton.addEventListener('click', loadProducts);
+loadProducts();

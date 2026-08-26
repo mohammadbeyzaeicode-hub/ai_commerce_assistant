@@ -321,7 +321,7 @@ class TelegramPoller:
         )
     async def create_user_menu(self):
         reply_keyboard = [
-            [KeyboardButton("🛒 خرید", web_app=WebAppInfo(url=f"{settings.MINI_APP_URL}/product"))],
+            [KeyboardButton("🛒 فروشگاه", web_app=WebAppInfo(url=f"{settings.MINI_APP_URL}"))],
             [KeyboardButton("📞 پشتیبانی")],
         ]
 
