@@ -7,8 +7,9 @@ from telegram.ext import ContextTypes, CommandHandler
 from pathlib import Path
 from typing import Optional
 import aiohttp
+from urllib.parse import urlencode
 from attrs import field
-from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup, Update, WebAppInfo
+from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup, Update, WebAppInfo, MenuButtonWebApp
 
 from back.src.core.db import SessionLocal
 from back.src.models.Enum.enum import SenderType
@@ -61,6 +62,29 @@ class TelegramPoller:
         self.tel_repo= TelegramBindingRepository
         self.reply_binding_service= ReplyMessageBindingServiceImpl(tel_repo=self.tel_repo)
 
+    @property
+    def mini_app_url(self) -> str:
+        separator = "&" if "?" in settings.MINI_APP_URL else "?"
+        return f"{settings.MINI_APP_URL}{separator}{urlencode({'bot_token': self.bot_token})}"
+
+    async def setup_menu_button(self):
+        """تنظیم دکمه دائمی منو برای تمام کاربران"""
+        try:
+            url = self.mini_app_url
+            print(f"📍 Menu URL: {url}")
+            
+            menu_button = MenuButtonWebApp(
+                text="🛒",
+                web_app=WebAppInfo(url=url)
+            )
+            await self.bot.set_chat_menu_button(menu_button=menu_button)
+            print("✅ Menu button set successfully")
+            print("📱 Menu button appears at the BOTTOM of chat (when you open the bot)")
+        except Exception as e:
+            print(f"❌ Error setting menu button: {e}")
+            import traceback
+            traceback.print_exc()
+
     # async def get_updates(self, session): 
     #     url = f"{self.base_url}/getUpdates?timeout=10&offset={self.offset}"
     #     async with session.get(url,timeout=aiohttp.ClientTimeout(total=30)) as resp:
@@ -79,6 +103,9 @@ class TelegramPoller:
     #         return data
         
     async def start(self):
+        # تنظیم منو دائمی در شروع
+        await self.setup_menu_button()
+        
         timeout = aiohttp.ClientTimeout(
             total=30,
             connect=10,
@@ -321,37 +348,18 @@ class TelegramPoller:
         )
     async def create_user_menu(self):
         reply_keyboard = [
-            [KeyboardButton("🛒 فروشگاه", web_app=WebAppInfo(url=f"{settings.MINI_APP_URL}"))],
-            [KeyboardButton("📞 پشتیبانی")],
+            [InlineKeyboardButton("🛒 فروشگاه", web_app=WebAppInfo(url=self.mini_app_url))],
+            [InlineKeyboardButton("📞 پشتیبانی", callback_data="support")],
         ]
 
-        reply_markup = ReplyKeyboardMarkup(
-            reply_keyboard,
-            resize_keyboard=True,            
-            # is_persistent=True,
-            one_time_keyboard=True
-            
-        )
+        reply_markup = InlineKeyboardMarkup(reply_keyboard)
         return reply_markup
     async def create_seller_menu(self):
         reply_keyboard = [
-            # ['🏠 منوی اصلی', '📞 پشتیبانی'],
-            # ['❌ بستن منو'],
-            [ KeyboardButton("فروشگاه", web_app=WebAppInfo(url=f"{settings.MINI_APP_URL}"))],
-            # ['📞 پشتیبانی'],
-            # ['🏠 منوی اصلی', '📞 پشتیبانی'],
-            # ['🏠 منوی اصلی', '📞 پشتیبانی'],
-         
-            
+            [InlineKeyboardButton("🛒 فروشگاه", web_app=WebAppInfo(url=self.mini_app_url))],
         ]
 
-        reply_markup = ReplyKeyboardMarkup(
-            reply_keyboard,
-            resize_keyboard=True,            
-            # is_persistent=True,
-            one_time_keyboard=True
-            
-        )
+        reply_markup = InlineKeyboardMarkup(reply_keyboard)
         return reply_markup
  
    
@@ -376,7 +384,7 @@ class TelegramPoller:
                     InlineKeyboardButton("📞 پشتیبانی", callback_data="menu:support"),
                     InlineKeyboardButton(
                         "🛒 خرید",
-                        web_app=WebAppInfo(url=settings.MINI_APP_URL),
+                        web_app=WebAppInfo(url=self.mini_app_url),
                     ),
                 ],
                 [

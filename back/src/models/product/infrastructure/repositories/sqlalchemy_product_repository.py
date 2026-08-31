@@ -32,3 +32,10 @@ class SqlAlchemyProductRepository(
             )
             .first()
         )
+
+    async def get_all_by_store(self, store_id: int):
+        return (
+            self.session.query(Product)
+            .filter(Product.store_id == store_id)
+            .all()
+        )
