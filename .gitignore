@@ -12,6 +12,5 @@ project_tree.txt
 seed/
 *.log
 *.yml
-*.ps1
-config.js
+
 

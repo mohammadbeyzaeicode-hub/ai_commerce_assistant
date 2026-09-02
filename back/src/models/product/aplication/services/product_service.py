@@ -14,7 +14,7 @@ class ProductService:
         return await self.product_repo.get_by_id_unique_store(product_id, store_id)
 
     async def search_products_by_name(self, name: str) -> List[Product]:
-        return await self.product_repo.search_products_by_name(name)
+        return await self.product_repo.search_by_name(name)
 
     async def list_products(self, store_id: int) -> List[Product]:
         return await self.product_repo.get_all_by_store(store_id)

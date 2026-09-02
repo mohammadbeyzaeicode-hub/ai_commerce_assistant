@@ -9,6 +9,7 @@ from back.src.models.Enum.enum import ChatState, SenderType
 from back.src.models.chat_session import ChatSession
 from back.src.models.clasess.CommandResult import Audience, CommandResult, MessageIntent, MessageResponse , SendAndBindMessage, UIMode ,UIAction
 from back.src.models.data_class.dataClass import IncomingMessage
+from back.src.models.product.infrastructure.repositories.sqlalchemy_product_repository import SqlAlchemyProductRepository
 from back.src.services import chat_log_service, order_service
 from back.src.services.chat_log_service import ChatLogService
 from back.src.services.integrations.context import RequestContext
@@ -95,7 +96,7 @@ class MessageRouter:
 
 # Repoها
             order_repo = SqlAlchemyOrderRepository(db_session)
-            product_repo = ProductRepository(db_session)
+            product_repo = SqlAlchemyProductRepository(db_session)
             st_channel_repo = StoreChannel_repository(db_session)
             store_repo = StoreRepository(db_session)
 

@@ -90,7 +90,7 @@ class TelegramPoller:
     #     async with session.get(url,timeout=aiohttp.ClientTimeout(total=30)) as resp:
     #         return await resp.json() 
     async def get_updates(self):
-        updates = await self.bot.get_updates(offset=self.offset, timeout=30)
+        updates = await self.bot.get_updates(offset=self.offset, timeout=100)
         if updates:
             self.offset = updates[-1].update_id + 1
         return updates
