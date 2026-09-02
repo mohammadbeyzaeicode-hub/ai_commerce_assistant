@@ -16,8 +16,8 @@ class ProductService:
     async def search_products_by_name(self, name: str) -> List[Product]:
         return await self.product_repo.search_products_by_name(name)
 
-    async def list_products(self) -> List[Product]:
-        return await self.product_repo.get_all()
+    async def list_products(self, store_id: int) -> List[Product]:
+        return await self.product_repo.get_all_by_store(store_id)
 
     # async def create_product(self, data: Dict) -> Product:
         # محل عالی برای افزودن validation در آینده

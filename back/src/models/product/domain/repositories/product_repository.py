@@ -20,3 +20,7 @@ class ProductRepository(ABC):
         store_id: int
     ) -> Optional[Product]:
         pass
+
+    @abstractmethod
+    async def get_all_by_store(self, store_id: int) -> list[Product]:
+        pass
