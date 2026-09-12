@@ -1,204 +1,550 @@
-# Sale Agent Bot
+# AI Commerce Assistant
 
-An AI-powered sales assistant for Telegram-based commerce. The bot connects customers and sellers through a multi-tenant conversation workflow, uses an OpenAI-compatible LLM for intent detection and tool calling, and persists products, orders, chat history, and Telegram message bindings in a relational database.
+> An AI-powered commerce assistant for sellers, designed to automate customer conversations, product discovery, and order management through conversational interfaces.
 
-## Highlights
+**AI Commerce Assistant** is an ongoing project focused on building an intelligent commerce layer between sellers and their customers.
 
-- Telegram long polling with support for multiple store channels
-- Buyer and seller conversation roles with separate system prompts
-- LLM-driven tool calling for:
-  - Product and inventory search
-  - Product creation and updates for sellers
-  - Order creation
-  - Escalation to a human seller
-- Tenant resolution per Telegram bot/channel
-- Persistent chat sessions and message history
-- Reply-to-message binding for seller/customer conversations
-- SQLAlchemy models and Alembic migrations
-- Pluggable session backends, including JSON, in-memory, database, and Redis implementations
+The initial implementation is built around **Telegram**, where an AI agent can interact with customers, access store data, answer product-related questions, and assist with order processing.
 
-## Architecture
+The project is gradually evolving from a simple chatbot into a modular commerce platform with a clear separation between **AI, domain logic, infrastructure, and communication channels**.
 
-```mermaid
-flowchart TD
-    Telegram[Telegram users and sellers] --> Poller[Telegram poller]
-    Poller --> Events[Normalized message events]
-    Events --> Router[Message router]
-    Router --> Context[Tenant and request context]
-    Router --> Orchestrator[LLM orchestrator]
-    Orchestrator --> Tools[Business tools]
-    Tools --> Services[Domain services]
-    Services --> Repositories[SQLAlchemy repositories]
-    Repositories --> Database[(SQLite database)]
-    Orchestrator --> Sessions[Conversation session backend]
-    Router --> Effects[Telegram effect executor]
-    Effects --> Telegram
-```
+---
 
-The main request flow is:
+## 🎯 Project Goal
 
-1. `TelegramPoller` receives updates from Telegram.
-2. The update is normalized into an internal message event.
-3. `MessageRouter` resolves the tenant, user, seller, and chat session.
-4. `LLMOrchestrator` selects a response or calls an available business tool.
-5. Services and repositories perform the domain and database operations.
-6. The Telegram adapter sends the resulting messages and UI effects.
+Many small online sellers manage their businesses through messaging platforms such as Telegram and Instagram.
 
-## Project Structure
+Their product information, customer conversations, inventory, and orders are often handled manually.
+
+The goal of this project is to build an AI assistant that can operate on top of the seller's existing commerce data and handle common interactions conversationally.
+
+The long-term vision is:
 
 ```text
-src/
-├── ai/                         LLM client, orchestrators, prompts, and tools
-├── core/                       Settings, database, and tenant utilities
-├── models/                     SQLAlchemy models and domain data classes
-├── repositories/               Database access layer
-├── services/                   Business services and integrations
-│   ├── adapter/                Telegram and transport adapters
-│   └── integrations/           Poller, events, context, and message routing
-├── sessions/                   Conversation session backends
-└── test/                       Integration and repository test scripts
-alembic/                        Database migration environment and revisions
-guide/                          Architecture and development notes
+Customer
+   │
+   ▼
+Communication Channel
+(Telegram / Web / ...)
+   │
+   ▼
+AI Commerce Assistant
+   │
+   ├── Product Discovery
+   ├── Store Information
+   ├── Inventory
+   ├── Order Management
+   └── Seller Operations
+          │
+          ▼
+       Store Data
 ```
 
-## Requirements
+The AI should not simply generate text.
 
-- Python 3.10 or newer
-- A Telegram bot token
-- An API key for an OpenAI-compatible chat-completions provider
-- SQLite for the current default database configuration
-- Alembic for database migrations
+It should be able to **understand the conversation, reason about the available store data, and perform actions through tools**.
 
-## Installation
+---
 
-Clone the repository and create a virtual environment:
+# 🚀 Current Status
 
-```bash
-git clone <your-repository-url>
-cd sale_agent_bot
-python -m venv .venv
+The project is actively under development.
+
+### Currently implemented
+
+* Telegram-based AI assistant
+* LLM integration
+* AI tool/function calling
+* Product domain and persistence
+* Store-aware request context
+* Telegram channel → store resolution
+* FastAPI backend
+* Telegram Mini App prototype
+* Mini App → FastAPI communication
+* Product retrieval through the API
+* Initial Feature-Based / Modular Monolith migration
+
+### Currently being developed
+
+* Product vertical slice
+* Cleaner domain/application/infrastructure boundaries
+* Seller-facing AI operations
+* Product browsing experience through Mini App
+* More robust store/tenant context handling
+* Order workflows
+* Channel-independent architecture
+
+---
+
+# 🧠 AI Layer
+
+The AI layer is designed around an **agent/tool-calling architecture**.
+
+Instead of giving the LLM direct access to the database, the model interacts with controlled application tools.
+
+Conceptually:
+
+```text
+User Message
+     │
+     ▼
+   LLM
+     │
+     ├── Answer directly
+     │
+     └── Call Tool
+           │
+           ▼
+      Application Logic
+           │
+           ▼
+        Repository
+           │
+           ▼
+        Database
 ```
 
-Activate it on Windows PowerShell:
+This allows the AI to work with real application state rather than relying only on information contained in the model's context.
 
-```powershell
-.\.venv\Scripts\Activate.ps1
+Examples of potential AI capabilities include:
+
+* Searching products
+* Retrieving product information
+* Checking inventory
+* Creating orders
+* Updating store information
+* Answering seller questions
+* Assisting customers with product discovery
+
+The AI layer is intentionally separated from the underlying commerce domain so that the same business capabilities can later be used by other interfaces.
+
+---
+
+# 🏗️ Architecture
+
+The project is gradually moving toward a **Feature-Based Modular Monolith** architecture.
+
+Instead of organizing the entire application primarily around technical layers such as:
+
+```text
+controllers/
+services/
+repositories/
+models/
 ```
 
-Activate it on macOS or Linux:
+the goal is to organize business capabilities around features:
 
-```bash
-source .venv/bin/activate
+```text
+Product
+Order
+Store
+AI
+...
 ```
 
-Install the dependencies:
+Each feature owns the logic relevant to that business capability.
 
-```bash
-python -m pip install --upgrade pip
-pip install -r requirements.txt
-pip install alembic
+A simplified representation:
+
+```text
+backend/
+│
+├── src/
+│   │
+│   ├── modules/
+│   │   ├── product/
+│   │   │   ├── domain/
+│   │   │   ├── application/
+│   │   │   ├── infrastructure/
+│   │   │   └── ...
+│   │   │
+│   │   ├── order/
+│   │   └── store/
+│   │
+│   ├── ai/
+│   │
+│   ├── infrastructure/
+│   │
+│   └── interfaces/
+│       ├── http/
+│       └── telegram/
+│
+└── ...
 ```
 
-## Configuration
+The architecture is being introduced incrementally rather than through a complete rewrite.
 
-Create a `.env` file in the project root:
+---
 
-```dotenv
-GAPGPT_API_KEY=your-llm-api-key
-GAPGPT_BASE_URL=https://your-openai-compatible-provider.example/v1
-model=your-model-name
-TELEGRAM_BOT_TOKEN=your-telegram-bot-token
+# 📦 Product Feature
 
-# Optional
-OPENAI_API_KEY=
-REDIS_URL=
-DATABASE_URL=
-SELLER_IDS=
+The **Product** feature is currently the main vertical being migrated to the new architecture.
+
+A simplified structure:
+
+```text
+product/
+│
+├── domain/
+│   ├── entities/
+│   │   └── product.py
+│   │
+│   └── repositories/
+│       └── product_repository.py
+│
+├── application/
+│   └── services/
+│       └── product_service.py
+│
+└── infrastructure/
+    └── repositories/
+        └── sqlalchemy_product_repository.py
 ```
 
-The current `src/core/db.py` configuration uses `sqlite:///./app.db`, and `alembic.ini` targets the same SQLite database. `DATABASE_URL` is loaded into settings but is not yet used to override the engine URL.
+The important architectural distinction is:
 
-## Database Setup
+### Domain Repository
 
-Apply the existing migrations from the repository root:
+Defines what the domain/application needs:
 
-```bash
-alembic upgrade head
+```text
+ProductRepository
 ```
 
-The Telegram poller loads bot/channel records from the database. Before starting it, make sure the relevant store and Telegram channel records exist and that the channel reference contains the Telegram bot token.
+It describes the contract without depending on SQLAlchemy or a specific database.
 
-To create a new migration after changing the SQLAlchemy models:
+### Infrastructure Repository
 
-```bash
-alembic revision --autogenerate -m "describe the change"
-alembic upgrade head
+Implements that contract using the actual persistence technology:
+
+```text
+SqlAlchemyProductRepository
 ```
 
-## Running the Telegram Poller
+This keeps database-specific concerns outside the domain.
 
-The current repository does not yet include a production `src/main.py` entrypoint. The available poller runner is `src/test/poller_test.py`:
+---
 
-```bash
-python src/test/poller_test.py
+# 🌐 FastAPI
+
+FastAPI is used as the HTTP interface for the backend.
+
+Current responsibilities include:
+
+* HTTP API
+* API versioning
+* CORS configuration
+* Dependency management
+* Product endpoints
+* Mini App integration
+
+Current API flow:
+
+```text
+Telegram Mini App
+        │
+        │ HTTP
+        ▼
+     FastAPI
+        │
+        ▼
+ Product Feature
+        │
+        ▼
+ Repository
+        │
+        ▼
+    Database
 ```
 
-It creates one polling task for each Telegram channel stored in the database. The process must be kept running to receive updates.
+The first working Mini App → FastAPI integration is already in place, with the Mini App successfully retrieving products from the backend.
 
-## Testing
+---
 
-The repository currently contains executable test and diagnostic scripts rather than a configured pytest suite. Run individual scripts from the project root, for example:
+# 📱 Telegram Mini App
 
-```bash
-python src/test/dbtest.py
-python src/test/repo_test.py
-python src/test/llm_test.py
+The Telegram Mini App is being developed as a complementary interface rather than replacing the conversational bot.
+
+The current approach is:
+
+```text
+Telegram Bot
+    │
+    ├── AI Conversation
+    │
+    └── Mini App
+          │
+          ├── Product Listing
+          ├── Product Details
+          └── Future commerce UI
 ```
 
-These scripts may require a configured database and valid provider credentials. Avoid running integration scripts against production data.
+The bot remains the primary conversational interface.
 
-## Development Notes
+The Mini App is intended for interactions where a visual UI provides a better experience than chat, such as:
 
-- Keep business rules in `src/services/` and database access in `src/repositories/`.
-- Add LLM-callable behavior as a tool under `src/ai/tools/` and register it in the router/orchestrator flow.
-- Update the buyer and seller prompts in `src/ai/prompts/` when changing conversational behavior.
-- Do not commit `.env`, API keys, bot tokens, `app.db`, or session data.
-- Telegram polling requires network access to the Telegram Bot API.
+* Browsing products
+* Viewing product details
+* Future shopping flows
+* Potential cart/order interfaces
 
-## Roadmap
+This avoids forcing every interaction into a Telegram chat interface.
 
-- Add a dedicated production entrypoint and process configuration.
-- Make `DATABASE_URL` control the SQLAlchemy engine and Alembic configuration.
-- Add automated unit and integration tests.
-- Complete additional channel adapters such as Instagram and web transport.
-- Add structured logging, health checks, and deployment documentation.
+---
 
-## License
+# 🔐 Store / Tenant Context
 
-No license file is currently included. Add a license before publishing the repository for reuse by others.
+The system is designed to support multiple stores.
 
-## توضیح فارسی
+Requests therefore need to be resolved to the correct store before accessing store-specific data.
 
-این پروژه یک دستیار فروش هوشمند و قابل توسعه برای کسب‌وکارهای مبتنی بر تلگرام است. هدف آن این است که بخش زیادی از گفتگوهای روزمره فروشگاه را به‌صورت خودکار مدیریت کند؛ از پاسخ‌گویی به سوالات مشتری درباره محصولات و موجودی گرفته تا ثبت سفارش و انتقال گفتگو به فروشنده در زمان نیاز.
+Conceptually:
 
-### نحوه کار
+```text
+Channel
+   │
+   ▼
+Context Resolver
+   │
+   ▼
+Store Context
+   │
+   ├── store_id
+   ├── user_id
+   └── channel
+```
 
-ربات پیام‌های دریافتی از تلگرام را دریافت و به یک قالب داخلی تبدیل می‌کند. سپس سیستم فروشگاه، کانال، مشتری و فروشنده مرتبط با پیام را شناسایی کرده و سابقه گفت‌وگو را بارگذاری می‌کند. در مرحله بعد، مدل زبانی بر اساس نقش کاربر و prompt مربوط به همان نقش تصمیم می‌گیرد که پاسخ مستقیم بدهد یا یکی از ابزارهای کسب‌وکار را اجرا کند.
+This prevents business operations from accidentally accessing data belonging to another store.
 
-ابزارها می‌توانند برای بررسی موجودی، جستجوی محصولات، ایجاد یا ویرایش محصول، ثبت سفارش و درخواست ارتباط با فروشنده استفاده شوند. نتیجه اجرای ابزار دوباره در اختیار مدل زبانی قرار می‌گیرد تا پاسخ نهایی طبیعی و قابل فهمی برای کاربر تولید شود.
+The architecture also keeps the concept of a **channel** separate from the business domain so that future interfaces such as Web or Instagram do not require the core business logic to become Telegram-specific.
 
-### نقش‌های سیستم
+---
 
-- **مشتری:** می‌تواند درباره محصولات سوال بپرسد، موجودی را بررسی کند، سفارش ثبت کند یا درخواست صحبت با فروشنده بدهد.
-- **فروشنده:** می‌تواند محصولات را مدیریت کند، موجودی را تغییر دهد و به گفتگوهای ارجاع‌شده از طرف مشتری پاسخ دهد.
-- **ربات:** وظیفه تشخیص درخواست، اجرای ابزار مناسب، مدیریت تاریخچه گفتگو و ارسال پاسخ را بر عهده دارد.
+# 🗄️ Data Layer
 
-### معماری و ذخیره‌سازی
+The current backend uses:
 
-کد پروژه به چند لایه تقسیم شده است. لایه `services` منطق کسب‌وکار را اجرا می‌کند، لایه `repositories` مسئول ارتباط با دیتابیس است و مدل‌های SQLAlchemy ساختار داده‌هایی مانند فروشگاه، محصول، سفارش، کاربر و پیام‌های گفتگو را تعریف می‌کنند. برای مدیریت تغییرات دیتابیس نیز از Alembic استفاده شده است.
+* Python
+* SQLAlchemy
+* SQLite
+* Alembic
 
-پروژه از ساختار چندمستاجری پشتیبانی می‌کند؛ بنابراین می‌توان کانال‌های مختلف تلگرام و فروشگاه‌های جداگانه را با context و داده‌های مستقل مدیریت کرد. تاریخچه گفتگو نیز از طریق session backend ذخیره می‌شود و در وضعیت فعلی، SQLite و ذخیره‌سازی JSON در دسترس هستند.
+The current Product model contains concepts such as:
 
-### وضعیت فعلی پروژه
+```text
+Product
+├── id
+├── name
+├── description
+├── price
+├── inventory
+├── is_active
+└── store_id
+```
 
-اجرای فعلی بر پایه Telegram long polling و دیتابیس SQLite است. برای استفاده از پروژه باید کلید دسترسی سرویس مدل زبانی، توکن ربات تلگرام و اطلاعات اولیه فروشگاه و کانال در دیتابیس تنظیم شود. در حال حاضر پروژه بیشتر روی هسته گفتگو، ابزارهای فروش و اتصال تلگرام تمرکز دارد و برای استفاده production هنوز به entrypoint مستقل، تست‌های خودکار، logging ساختاریافته و تنظیمات کامل deployment نیاز دارد.
+Persistence is intentionally treated as an infrastructure concern.
+
+The goal is to keep business logic independent from SQLAlchemy wherever practical.
+
+---
+
+# 🛠️ Technology Stack
+
+| Area           | Technology                     |
+| -------------- | ------------------------------ |
+| Language       | Python                         |
+| AI             | LLM API + Tool Calling         |
+| Backend        | FastAPI                        |
+| Database       | SQLite                         |
+| ORM            | SQLAlchemy                     |
+| Migrations     | Alembic                        |
+| Bot            | python-telegram-bot            |
+| Frontend       | HTML / CSS / JavaScript        |
+| Mini App       | Telegram Web App               |
+| Local Exposure | Cloudflare Tunnel              |
+| Architecture   | Feature-Based Modular Monolith |
+
+---
+
+# 📁 Project Structure
+
+The project is currently being migrated incrementally, so the exact structure is evolving.
+
+The target direction is approximately:
+
+```text
+project/
+│
+├── backend/
+│   └── src/
+│       │
+│       ├── modules/
+│       │   ├── product/
+│       │   ├── order/
+│       │   └── store/
+│       │
+│       ├── ai/
+│       │   ├── llm_client.py
+│       │   ├── orchestrator.py
+│       │   └── tools/
+│       │
+│       ├── infrastructure/
+│       │   └── database/
+│       │
+│       └── interfaces/
+│           ├── http/
+│           └── telegram/
+│
+├── frontend/
+│   └── miniapp/
+│       ├── index.html
+│       ├── style.css
+│       └── app.js
+│
+└── ...
+```
+
+The structure will continue to evolve as additional business features are introduced.
+
+---
+
+# 🔄 Development Approach
+
+The architecture is not being designed in isolation before implementation.
+
+Instead, the project follows an **incremental migration approach**:
+
+```text
+Existing System
+      │
+      ▼
+Identify Business Feature
+      │
+      ▼
+Extract Domain Concepts
+      │
+      ▼
+Define Application Boundaries
+      │
+      ▼
+Move Infrastructure Concerns
+      │
+      ▼
+Expose Through Interfaces
+      │
+      ▼
+Repeat for Next Feature
+```
+
+The Product feature is currently serving as the first major vertical for validating this architecture.
+
+---
+
+# 🗺️ Roadmap
+
+### Phase 1 — Foundation
+
+* [x] Telegram AI bot
+* [x] LLM integration
+* [x] Tool calling
+* [x] Product persistence
+* [x] Store-aware context
+* [x] FastAPI foundation
+* [x] Mini App prototype
+* [x] Mini App → API product retrieval
+
+### Phase 2 — Modularization
+
+* [x] Begin Feature-Based architecture
+* [x] Introduce Product domain
+* [x] Separate repository contract from implementation
+* [ ] Complete Product vertical
+* [ ] Refine application services
+* [ ] Establish reusable infrastructure boundaries
+* [ ] Migrate additional features
+
+### Phase 3 — Commerce Workflows
+
+* [ ] Product browsing
+* [ ] Product details
+* [ ] Cart
+* [ ] Order creation
+* [ ] Order status
+* [ ] Inventory operations
+* [ ] Seller operations
+
+### Phase 4 — Multi-Channel
+
+* [ ] Web interface
+* [ ] Additional messaging channels
+* [ ] Channel-independent AI interaction layer
+* [ ] Unified commerce context
+
+---
+
+# 🎯 Long-Term Vision
+
+The long-term goal is not simply to build another chatbot.
+
+The goal is to create an **AI-native commerce assistant** capable of connecting conversational AI with real business operations.
+
+Instead of:
+
+```text
+Customer → Human → Database → Human → Customer
+```
+
+the system aims toward:
+
+```text
+Customer
+    │
+    ▼
+AI Assistant
+    │
+    ├── Understand intent
+    ├── Reason about store data
+    ├── Query business capabilities
+    ├── Execute actions
+    └── Respond naturally
+```
+
+The same underlying business capabilities should remain reusable across different channels and interfaces.
+
+---
+
+# 🧪 Project Status
+
+> **Early-stage / Active Development**
+
+This repository represents an actively evolving engineering project.
+
+Some architectural decisions are still being validated through implementation, particularly around:
+
+* Feature boundaries
+* AI/application interaction
+* Store context
+* Tool architecture
+* Multi-channel support
+* Commerce workflows
+
+The project intentionally favors **incremental architectural evolution** over premature abstraction.
+
+---
+
+# 📌 Why This Project?
+
+This project is also an exploration of a broader question:
+
+> **What should an AI assistant look like when it is connected to real business capabilities rather than being limited to conversation?**
+
+The focus is therefore not only on LLM integration, but also on the engineering problems around:
+
+* Agent/tool architecture
+* Domain modeling
+* Context and multi-tenancy
+* Modular architecture
+* AI-to-business-system integration
+* Human/computer interaction through conversational interfaces
+* Combining conversational and visual interfaces
